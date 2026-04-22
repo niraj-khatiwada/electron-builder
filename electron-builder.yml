@@ -43,3 +43,8 @@ publish:
   url: https://example.com/auto-updates
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
+electronFuses:
+  # Enable ASAR integrity validation
+  EnableEmbeddedAsarIntegrityValidation: true
+  # (Optional, but recommended) Ensure Electron only loads app code from app.asar
+  OnlyLoadAppFromAsar: true

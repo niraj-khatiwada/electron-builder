@@ -25,11 +25,21 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@heroui/react": "^3.0.3",
+    "@heroui/styles": "^3.0.3",
+    "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-devtools": "latest",
+    "@tanstack/react-router": "latest",
+    "@tanstack/react-router-devtools": "latest",
+    "@tanstack/router-plugin": "^1.132.0",
     "electron-updater": "^6.3.9",
-    "lint-staged": "^16.4.0"
+    "framer-motion": "^12.38.0",
+    "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^2.0.0",
+    "@tailwindcss/typography": "^0.5.16",
+    "@tanstack/devtools-vite": "latest",
     "@types/node": "^22.19.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -38,12 +48,14 @@
     "electron-builder": "^26.0.12",
     "electron-vite": "^5.0.0",
     "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "oxfmt": "^0.46.0",
     "oxlint": "^1.61.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "typescript": "^5.9.3",
-    "vite": "^7.2.6"
+    "vite": "^7.2.6",
+    "vite-plugin-svgr": "^4.3.0"
   },
   "lint-staged": {
     "*.{js,ts,cjs,cts,mjs,mts}": [

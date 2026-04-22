@@ -1,6 +1,8 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
+
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
+
 import icon from '../../resources/icon.png?asset'
 
 function createWindow(): void {
@@ -9,17 +11,25 @@ function createWindow(): void {
     width: 900,
     height: 670,
     show: false,
-    transparent: true,
     autoHideMenuBar: true,
+    vibrancy: 'fullscreen-ui',
+    backgroundMaterial: 'acrylic',
+    titleBarStyle: 'hidden',
+    ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      zoomFactor: 1
     }
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    if (import.meta.env.DEV) {
+      mainWindow.showInactive()
+    } else {
+      mainWindow.show()
+    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -34,6 +44,17 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  // Disable zoom
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    const isZoomShortcut =
+      (input.control || input.meta) &&
+      (input.key === '+' || input.key === '-' || input.key === '=' || input.key === '0')
+
+    if (isZoomShortcut) {
+      event.preventDefault()
+    }
+  })
 }
 
 // This method will be called when Electron has finished

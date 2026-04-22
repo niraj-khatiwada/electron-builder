@@ -1,0 +1,11 @@
+.container {
+  height: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.sidebar {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}

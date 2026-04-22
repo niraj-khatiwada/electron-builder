@@ -186,6 +186,7 @@
       "rules": {
         "react/rules-of-hooks": "error",
         "react/exhaustive-deps": "warn",
+        "typescript/explicit-function-return-type": "off",
         "react/only-export-components": [
           "error",
           {
