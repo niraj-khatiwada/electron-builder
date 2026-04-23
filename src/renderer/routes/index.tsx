@@ -13,7 +13,7 @@ export const Route = createFileRoute('/')({ component: App })
 
 function getInitialNavState(): boolean {
   const stored = localStorage.getItem(SIDENAV_STORAGE_KEY) as '0' | '1' | null
-  if (stored && ['0', '1'].includes(stored)) return stored === '0'
+  if (stored && ['0', '1'].includes(stored)) return stored === '1'
 
   return true
 }
