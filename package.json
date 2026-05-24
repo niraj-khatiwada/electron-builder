@@ -8,45 +8,55 @@
   "scripts": {
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build": "npm run typecheck && electron-vite build",
-    "build:unpack": "npm run build && electron-builder --dir",
-    "build:win": "npm run build && electron-builder --win",
+    "build": "pnpm run tsc:check && electron-vite build",
+    "build:unpack": "pnpm run build && electron-builder --dir",
+    "build:win": "pnpm run build && electron-builder --win",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux",
+    "postinstall": "electron-builder install-app-deps",
     "format": "oxfmt --write .",
     "lint": "oxlint .",
     "lint-staged": "lint-staged",
-    "postinstall": "electron-builder install-app-deps",
     "prepare": "husky",
     "tsc:check:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "tsc:check:web": "tsc --noEmit -p tsconfig.web.json --composite false",
-    "tsc:check": "npm run tsc:check:node && npm run tsc:check:web"
+    "tsc:check": "pnpm run tsc:check:node && npm run tsc:check:web"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@heroui/react": "^3.0.3",
     "@heroui/styles": "^3.0.3",
+    "@liquid-dom/core": "^0.1.0",
+    "@liquid-dom/r3f": "^0.1.0",
+    "@liquid-dom/react": "^0.1.0",
+    "@react-three/fiber": "^9.6.1",
     "@tailwindcss/vite": "^4.1.18",
-    "@tanstack/react-devtools": "latest",
-    "@tanstack/react-router": "latest",
-    "@tanstack/react-router-devtools": "latest",
+    "@tanstack/react-devtools": "^0.10.5",
+    "@tanstack/react-router": "^1.70.8",
+    "@tanstack/react-router-devtools": "^1.167.0",
     "@tanstack/router-plugin": "^1.132.0",
-    "electron-updater": "^6.3.9",
+    "@use-gesture/react": "^10.3.1",
+    "electron-updater": "^6.8.3",
     "framer-motion": "^12.38.0",
-    "tailwindcss": "^4.1.18"
+    "lucide-react": "^1.16.0",
+    "tailwindcss": "^4.1.18",
+    "three": "^0.184.0",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@tailwindcss/typography": "^0.5.16",
-    "@tanstack/devtools-vite": "latest",
+    "@tanstack/devtools-vite": "^0.7.0",
     "@types/node": "^22.19.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.184.1",
     "@vitejs/plugin-react": "^5.1.1",
-    "electron": "^39.2.6",
-    "electron-builder": "^26.0.12",
-    "electron-vite": "^5.0.0",
+    "@webgpu/types": "^0.1.70",
+    "electron": "^40.10.0",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^6.0.0-beta.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "oxfmt": "^0.46.0",
@@ -63,9 +73,11 @@
       "pnpm format"
     ]
   },
+  "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "onlyBuiltDependencies": [
       "electron",
+      "electron-winstaller",
       "esbuild"
     ]
   }

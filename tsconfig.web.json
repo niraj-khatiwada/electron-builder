@@ -4,18 +4,16 @@
     "src/renderer/env.d.ts",
     "src/renderer/**/*",
     "src/renderer/**/*.tsx",
-    "src/preload/*.d.ts"
+    "src/preload/*.d.ts",
   ],
-  "exclude": ["src/renderer/routeTree.gen.ts", "src/renderer/env.d.ts"],
+  "exclude": ["src/renderer/env.d.ts"],
   "compilerOptions": {
     "composite": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
     "types": ["vite/client"],
     "paths": {
-      "~/*": [
-        "src/renderer/*"
-      ]
-    }
-  }
+      "~/*": ["src/renderer/*"],
+    },
+  },
 }
