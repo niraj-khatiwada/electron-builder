@@ -1,12 +1,4 @@
 import {
-  type MutableRefObject,
-  type PointerEvent,
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
-import {
   type AnimateFunction,
   type AnimationControls,
   Frame,
@@ -18,51 +10,45 @@ import {
   LiquidCanvas,
   spring,
   useAnimate,
-  ZStack,
-} from "@liquid-dom/react";
+  ZStack
+} from '@liquid-dom/react'
+import { Bluetooth, Plane, Play, Podcast, Radio, RotateCcw, RotateCw, Wifi } from 'lucide-react'
 import {
-  Bluetooth,
-  Plane,
-  Play,
-  Podcast,
-  Radio,
-  RotateCcw,
-  RotateCw,
-  Wifi,
-} from "lucide-react";
-import albumArtUrl from "~/assets/images/tahoe.jpg";
-import backgroundUrl from "~/assets/images/tahoe.jpg";
-import styles from "./index.module.css";
+  type MutableRefObject,
+  type PointerEvent,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef
+} from 'react'
 
-const CARD_SIZE = 248;
-const CARD_RADIUS = 75;
-const DEFAULT_LIGHT_DIRECTION = -Math.PI / 6;
+import albumArtUrl from '~/assets/images/tahoe.jpg'
+import backgroundUrl from '~/assets/images/tahoe.jpg'
+
+import styles from './index.module.css'
+
+const CARD_SIZE = 248
+const CARD_RADIUS = 75
+const DEFAULT_LIGHT_DIRECTION = -Math.PI / 6
 const LIGHT_RESET_TRANSITION = spring({
   stiffness: 180,
   damping: 24,
-  restDelta: 0.001,
-});
+  restDelta: 0.001
+})
 
 export default function ControlCenter() {
-  const glassContainerRef = useRef<GlassContainerRef | null>(null);
-  const animateRef = useRef<AnimateFunction | null>(null);
-  const lightHandlers = useMouseLightDirection(glassContainerRef, animateRef);
+  const glassContainerRef = useRef<GlassContainerRef | null>(null)
+  const animateRef = useRef<AnimateFunction | null>(null)
+  const lightHandlers = useMouseLightDirection(glassContainerRef, animateRef)
 
   return (
     <section className={styles.root} {...lightHandlers}>
-      <LiquidCanvas
-        className={styles.canvasShell}
-        canvasClassName={styles.canvas}
-      >
+      <LiquidCanvas className={styles.canvasShell} canvasClassName={styles.canvas}>
         <LightAnimationBinder animateRef={animateRef} />
         <ZStack alignment="center">
           <Html zIndex={-2} sizing="fill">
             <div className={styles.backdrop}>
-              <img
-                alt=""
-                className={styles.backgroundImage}
-                src={backgroundUrl}
-              />
+              <img alt="" className={styles.backgroundImage} src={backgroundUrl} />
             </div>
           </Html>
 
@@ -95,108 +81,103 @@ export default function ControlCenter() {
         </ZStack>
       </LiquidCanvas>
     </section>
-  );
+  )
 }
 
 function useMouseLightDirection(
   glassContainerRef: MutableRefObject<GlassContainerRef | null>,
-  animateRef: MutableRefObject<AnimateFunction | null>,
+  animateRef: MutableRefObject<AnimateFunction | null>
 ) {
-  const lightDirectionRef = useRef(DEFAULT_LIGHT_DIRECTION);
-  const lightResetAnimationRef = useRef<AnimationControls | null>(null);
+  const lightDirectionRef = useRef(DEFAULT_LIGHT_DIRECTION)
+  const lightResetAnimationRef = useRef<AnimationControls | null>(null)
 
   const setLightDirection = useCallback(
     (lightDirection: number) => {
-      lightDirectionRef.current = lightDirection;
+      lightDirectionRef.current = lightDirection
 
       if (glassContainerRef.current) {
-        glassContainerRef.current.lightDirection = lightDirection;
+        glassContainerRef.current.lightDirection = lightDirection
       }
     },
-    [glassContainerRef],
-  );
+    [glassContainerRef]
+  )
 
   const stopLightResetAnimation = useCallback(() => {
-    lightResetAnimationRef.current?.stop();
-    lightResetAnimationRef.current = null;
-  }, []);
+    lightResetAnimationRef.current?.stop()
+    lightResetAnimationRef.current = null
+  }, [])
 
   const handlePointerMove = useCallback(
     (event: PointerEvent<HTMLElement>) => {
-      stopLightResetAnimation();
+      stopLightResetAnimation()
 
-      const { left, width } = event.currentTarget.getBoundingClientRect();
-      const progress = Math.min(1, Math.max(0, (event.clientX - left) / width));
-      const lightDirection = progress * Math.PI - Math.PI / 2;
+      const { left, width } = event.currentTarget.getBoundingClientRect()
+      const progress = Math.min(1, Math.max(0, (event.clientX - left) / width))
+      const lightDirection = progress * Math.PI - Math.PI / 2
 
-      setLightDirection(lightDirection);
+      setLightDirection(lightDirection)
     },
-    [setLightDirection, stopLightResetAnimation],
-  );
+    [setLightDirection, stopLightResetAnimation]
+  )
 
   const handlePointerLeave = useCallback(() => {
-    stopLightResetAnimation();
+    stopLightResetAnimation()
 
-    const animate = animateRef.current;
-    const glassContainer = glassContainerRef.current;
+    const animate = animateRef.current
+    const glassContainer = glassContainerRef.current
     if (!animate || !glassContainer) {
-      setLightDirection(DEFAULT_LIGHT_DIRECTION);
-      return;
+      setLightDirection(DEFAULT_LIGHT_DIRECTION)
+      return
     }
 
     const controls = animate(
       glassContainer,
       { lightDirection: DEFAULT_LIGHT_DIRECTION },
-      LIGHT_RESET_TRANSITION,
-    );
-    lightResetAnimationRef.current = controls;
+      LIGHT_RESET_TRANSITION
+    )
+    lightResetAnimationRef.current = controls
 
     void controls.finished.then(() => {
       if (lightResetAnimationRef.current !== controls) {
-        return;
+        return
       }
 
-      lightResetAnimationRef.current = null;
-      lightDirectionRef.current = glassContainer.lightDirection;
-    });
-  }, [
-    animateRef,
-    glassContainerRef,
-    setLightDirection,
-    stopLightResetAnimation,
-  ]);
+      lightResetAnimationRef.current = null
+      lightDirectionRef.current = glassContainer.lightDirection
+    })
+  }, [animateRef, glassContainerRef, setLightDirection, stopLightResetAnimation])
 
   useEffect(
     () => () => {
-      lightResetAnimationRef.current?.stop();
+      lightResetAnimationRef.current?.stop()
     },
-    [],
-  );
+    []
+  )
 
   return {
     onPointerMove: handlePointerMove,
-    onPointerLeave: handlePointerLeave,
-  };
+    onPointerLeave: handlePointerLeave
+  }
 }
 
 function LightAnimationBinder({
-  animateRef,
+  animateRef
 }: {
-  animateRef: MutableRefObject<AnimateFunction | null>;
+  animateRef: MutableRefObject<AnimateFunction | null>
 }) {
-  const animate = useAnimate();
+  const animate = useAnimate()
 
   useEffect(() => {
-    animateRef.current = animate;
+    animateRef.current = animate
 
     return () => {
       if (animateRef.current === animate) {
-        animateRef.current = null;
+        animateRef.current = null
       }
-    };
-  }, [animate, animateRef]);
+    }
+  }, [animate, animateRef])
 
-  return null;
+  return null
 }
 
 function ControlCard({ children }: { children: ReactNode }) {
@@ -208,7 +189,7 @@ function ControlCard({ children }: { children: ReactNode }) {
         </Html>
       </Frame>
     </Glass>
-  );
+  )
 }
 
 function ConnectivityCard() {
@@ -224,25 +205,21 @@ function ConnectivityCard() {
         <Wifi className={styles.largeIcon} />
       </IconButton>
       <button className={styles.smallButtonGroup} type="button">
-        <span className={[styles.groupButton, styles.cellularButton].join(" ")}>
+        <span className={[styles.groupButton, styles.cellularButton].join(' ')}>
           <CellularBars />
         </span>
-        <span
-          className={[styles.groupButton, styles.bluetoothButton].join(" ")}
-        >
+        <span className={[styles.groupButton, styles.bluetoothButton].join(' ')}>
           <Bluetooth className={styles.smallIcon} />
         </span>
-        <span
-          className={[styles.groupButton, styles.satelliteButton].join(" ")}
-        >
+        <span className={[styles.groupButton, styles.satelliteButton].join(' ')}>
           <Radio className={styles.smallIcon} />
         </span>
-        <span className={[styles.groupButton, styles.antennaButton].join(" ")}>
+        <span className={[styles.groupButton, styles.antennaButton].join(' ')}>
           <Podcast className={styles.smallIcon} />
         </span>
       </button>
     </div>
-  );
+  )
 }
 
 function MediaCard() {
@@ -259,7 +236,7 @@ function MediaCard() {
       <div className={styles.transport}>
         <SkipButton direction="back" />
         <button
-          className={[styles.mediaButton, styles.playButton].join(" ")}
+          className={[styles.mediaButton, styles.playButton].join(' ')}
           type="button"
           aria-label="Play"
         >
@@ -268,38 +245,30 @@ function MediaCard() {
         <SkipButton direction="forward" />
       </div>
     </div>
-  );
+  )
 }
 
-function IconButton({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className: string;
-}) {
+function IconButton({ children, className }: { children: ReactNode; className: string }) {
   return (
-    <button className={[styles.iconButton, className].join(" ")} type="button">
+    <button className={[styles.iconButton, className].join(' ')} type="button">
       {children}
     </button>
-  );
+  )
 }
 
-function SkipButton({ direction }: { direction: "back" | "forward" }) {
-  const Icon = direction === "back" ? RotateCcw : RotateCw;
+function SkipButton({ direction }: { direction: 'back' | 'forward' }) {
+  const Icon = direction === 'back' ? RotateCcw : RotateCw
 
   return (
     <button
-      className={[styles.mediaButton, styles.skipButton].join(" ")}
+      className={[styles.mediaButton, styles.skipButton].join(' ')}
       type="button"
-      aria-label={
-        direction === "back" ? "Back 15 seconds" : "Forward 15 seconds"
-      }
+      aria-label={direction === 'back' ? 'Back 15 seconds' : 'Forward 15 seconds'}
     >
       <Icon className={styles.skipIcon} />
       <span>15</span>
     </button>
-  );
+  )
 }
 
 function CellularBars() {
@@ -310,5 +279,5 @@ function CellularBars() {
       <span />
       <span />
     </span>
-  );
+  )
 }

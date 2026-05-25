@@ -1,40 +1,41 @@
-import { resolve } from "path";
+import { resolve } from 'path'
 
-import tailwindcss from "@tailwindcss/vite";
-import { devtools } from "@tanstack/devtools-vite";
-import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import react from "@vitejs/plugin-react";
-import { defineConfig } from "electron-vite";
-import svgr from "vite-plugin-svgr";
+import tailwindcss from '@tailwindcss/vite'
+import { devtools } from '@tanstack/devtools-vite'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'electron-vite'
+import svgr from 'vite-plugin-svgr'
 
 export default defineConfig({
   main: {
     build: {
-      bytecode: true,
-    },
+      bytecode: true
+    }
   },
   preload: {
     build: {
-      bytecode: true,
-    },
+      bytecode: true
+    }
   },
   renderer: {
+    appType: 'spa',
     resolve: {
       alias: {
-        "~": resolve("src/renderer"),
-      },
+        '~': resolve('src/renderer')
+      }
     },
     plugins: [
       devtools(),
       tailwindcss(),
       tanstackRouter({
-        target: "react",
+        target: 'react',
         autoCodeSplitting: true,
-        routesDirectory: "routes",
-        generatedRouteTree: "routeTree.gen.ts",
+        routesDirectory: 'routes',
+        generatedRouteTree: 'routeTree.gen.ts'
       }),
       react(),
-      svgr(),
-    ],
-  },
-});
+      svgr()
+    ]
+  }
+})

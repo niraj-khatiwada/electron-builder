@@ -1,12 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
-import { useDrag } from "@use-gesture/react";
-import type { GlassPointerEvent } from "@liquid-dom/core";
+import type { GlassPointerEvent } from '@liquid-dom/core'
 import {
   Frame,
   Glass,
@@ -25,8 +17,9 @@ import {
   type AnimationControls,
   type GlassContainerRef,
   type GlassProps,
-  type TransformRef,
-} from "@liquid-dom/react";
+  type TransformRef
+} from '@liquid-dom/react'
+import { useDrag } from '@use-gesture/react'
 import {
   BookOpen,
   Camera,
@@ -49,221 +42,202 @@ import {
   StickyNote,
   WalletCards,
   Workflow,
-  type LucideIcon,
-} from "lucide-react";
-import abstractShapesUrl from "~/assets/images/tahoe.jpg";
-import styles from "./index.module.css";
+  type LucideIcon
+} from 'lucide-react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 
-const PANEL_OPEN_Y = 0;
-const PANEL_CLOSED_Y = -1000;
-const PANEL_CORNER_RADIUS = 70;
-const PANEL_RUBBERBAND = 0.16;
-const PANEL_IOR_TRANSITION_DISTANCE = 170;
-const PANEL_BASE_IOR = 1.5;
-const PANEL_OPEN_IOR = 1;
-const PANEL_BASE_DISPERSION = 0.2;
-const PANEL_OPEN_DISPERSION = 0;
+import abstractShapesUrl from '~/assets/images/tahoe.jpg'
 
-const BUTTON_SIZE = 50;
-const BUTTON_HOVER_SCALE = 1.08;
-const BUTTON_PRESS_SCALE = 0.94;
+import styles from './index.module.css'
 
-const PANEL_TRANSITION = spring({ stiffness: 360, damping: 42 });
-const BUTTON_SCALE_TRANSITION = spring({ stiffness: 720, damping: 42 });
-const APP_ICON_OPACITY_TRANSITION = spring({ stiffness: 420, damping: 42 });
+const PANEL_OPEN_Y = 0
+const PANEL_CLOSED_Y = -1000
+const PANEL_CORNER_RADIUS = 70
+const PANEL_RUBBERBAND = 0.16
+const PANEL_IOR_TRANSITION_DISTANCE = 170
+const PANEL_BASE_IOR = 1.5
+const PANEL_OPEN_IOR = 1
+const PANEL_BASE_DISPERSION = 0.2
+const PANEL_OPEN_DISPERSION = 0
+
+const BUTTON_SIZE = 50
+const BUTTON_HOVER_SCALE = 1.08
+const BUTTON_PRESS_SCALE = 0.94
+
+const PANEL_TRANSITION = spring({ stiffness: 360, damping: 42 })
+const BUTTON_SCALE_TRANSITION = spring({ stiffness: 720, damping: 42 })
+const APP_ICON_OPACITY_TRANSITION = spring({ stiffness: 420, damping: 42 })
 
 type GlassDragBind = Pick<
   GlassProps,
-  "onPointerDown" | "onPointerMove" | "onPointerUp" | "onPointerCancel"
->;
+  'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'onPointerCancel'
+>
 type AppIconSpec = {
-  label: string;
-  color: string;
-  Icon: LucideIcon;
-};
+  label: string
+  color: string
+  Icon: LucideIcon
+}
 
 const appIcons: AppIconSpec[] = [
-  { label: "Music", color: "#ff2d55", Icon: Music },
-  { label: "Photos", color: "#ff9500", Icon: Image },
-  { label: "Maps", color: "#34c759", Icon: Map },
-  { label: "Mail", color: "#007aff", Icon: Mail },
-  { label: "Files", color: "#5856d6", Icon: Folder },
-  { label: "Notes", color: "#ffcc00", Icon: StickyNote },
-  { label: "Health", color: "#ff3b30", Icon: HeartPulse },
-  { label: "Home", color: "#00c7be", Icon: House },
-  { label: "Weather", color: "#32ade6", Icon: CloudSun },
-  { label: "Wallet", color: "#af52de", Icon: WalletCards },
-  { label: "Books", color: "#ff9f0a", Icon: BookOpen },
-  { label: "Store", color: "#5e5ce6", Icon: ShoppingBag },
-  { label: "News", color: "#ff453a", Icon: Newspaper },
-  { label: "Fitness", color: "#30d158", Icon: Dumbbell },
-  { label: "Podcasts", color: "#bf5af2", Icon: Podcast },
-];
+  { label: 'Music', color: '#ff2d55', Icon: Music },
+  { label: 'Photos', color: '#ff9500', Icon: Image },
+  { label: 'Maps', color: '#34c759', Icon: Map },
+  { label: 'Mail', color: '#007aff', Icon: Mail },
+  { label: 'Files', color: '#5856d6', Icon: Folder },
+  { label: 'Notes', color: '#ffcc00', Icon: StickyNote },
+  { label: 'Health', color: '#ff3b30', Icon: HeartPulse },
+  { label: 'Home', color: '#00c7be', Icon: House },
+  { label: 'Weather', color: '#32ade6', Icon: CloudSun },
+  { label: 'Wallet', color: '#af52de', Icon: WalletCards },
+  { label: 'Books', color: '#ff9f0a', Icon: BookOpen },
+  { label: 'Store', color: '#5e5ce6', Icon: ShoppingBag },
+  { label: 'News', color: '#ff453a', Icon: Newspaper },
+  { label: 'Fitness', color: '#30d158', Icon: Dumbbell },
+  { label: 'Podcasts', color: '#bf5af2', Icon: Podcast }
+]
 
 const trayIcons: AppIconSpec[] = [
-  { label: "Camera", color: "#8e8e93", Icon: Camera },
-  { label: "Safari", color: "#0a84ff", Icon: Compass },
-  { label: "Shortcuts", color: "#bf5af2", Icon: Workflow },
-  { label: "Messages", color: "#30d158", Icon: MessageCircle },
-];
+  { label: 'Camera', color: '#8e8e93', Icon: Camera },
+  { label: 'Safari', color: '#0a84ff', Icon: Compass },
+  { label: 'Shortcuts', color: '#bf5af2', Icon: Workflow },
+  { label: 'Messages', color: '#30d158', Icon: MessageCircle }
+]
 
 function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
+  return Math.min(Math.max(value, min), max)
 }
 
 function getPanelIor(panelY: number) {
-  const progress = getPanelOpenTransitionProgress(panelY);
+  const progress = getPanelOpenTransitionProgress(panelY)
 
-  return PANEL_BASE_IOR + (PANEL_OPEN_IOR - PANEL_BASE_IOR) * progress;
+  return PANEL_BASE_IOR + (PANEL_OPEN_IOR - PANEL_BASE_IOR) * progress
 }
 
 function getPanelDispersion(panelY: number) {
-  const progress = getPanelOpenTransitionProgress(panelY);
+  const progress = getPanelOpenTransitionProgress(panelY)
 
-  return (
-    PANEL_BASE_DISPERSION +
-    (PANEL_OPEN_DISPERSION - PANEL_BASE_DISPERSION) * progress
-  );
+  return PANEL_BASE_DISPERSION + (PANEL_OPEN_DISPERSION - PANEL_BASE_DISPERSION) * progress
 }
 
 function getPanelOpenTransitionProgress(panelY: number) {
   return clamp(
-    (panelY - (PANEL_OPEN_Y - PANEL_IOR_TRANSITION_DISTANCE)) /
-      PANEL_IOR_TRANSITION_DISTANCE,
+    (panelY - (PANEL_OPEN_Y - PANEL_IOR_TRANSITION_DISTANCE)) / PANEL_IOR_TRANSITION_DISTANCE,
     0,
-    1,
-  );
+    1
+  )
 }
 
 export default function NotificationCenter() {
   return (
     <section className={styles.root}>
-      <LiquidCanvas
-        className={styles.canvasShell}
-        canvasClassName={styles.canvas}
-      >
+      <LiquidCanvas className={styles.canvasShell} canvasClassName={styles.canvas}>
         <NotificationCenterScene />
       </LiquidCanvas>
     </section>
-  );
+  )
 }
 
 function NotificationCenterScene() {
-  const animate = useAnimate();
-  const invalidateFrame = useInvalidateFrame();
-  const [dragging, setDragging] = useState(false);
-  const [appIconsVisible, setAppIconsVisible] = useState(false);
-  const panelContainerRef = useRef<GlassContainerRef | null>(null);
-  const panelTransformRef = useRef<TransformRef | null>(null);
-  const controlsTransformRef = useRef<TransformRef | null>(null);
-  const yRef = useRef(PANEL_OPEN_Y);
-  const panelAnimationRef = useRef<AnimationControls | null>(null);
-  const controlsAnimationRef = useRef<AnimationControls | null>(null);
+  const animate = useAnimate()
+  const invalidateFrame = useInvalidateFrame()
+  const [dragging, setDragging] = useState(false)
+  const [appIconsVisible, setAppIconsVisible] = useState(false)
+  const panelContainerRef = useRef<GlassContainerRef | null>(null)
+  const panelTransformRef = useRef<TransformRef | null>(null)
+  const controlsTransformRef = useRef<TransformRef | null>(null)
+  const yRef = useRef(PANEL_OPEN_Y)
+  const panelAnimationRef = useRef<AnimationControls | null>(null)
+  const controlsAnimationRef = useRef<AnimationControls | null>(null)
 
   function setPanelY(panelY: number) {
-    yRef.current = panelY;
+    yRef.current = panelY
 
     if (panelTransformRef.current) {
-      panelTransformRef.current.y = panelY;
+      panelTransformRef.current.y = panelY
     }
 
     if (controlsTransformRef.current) {
-      controlsTransformRef.current.y = panelY;
+      controlsTransformRef.current.y = panelY
     }
 
     if (panelContainerRef.current) {
-      panelContainerRef.current.ior = getPanelIor(panelY);
-      panelContainerRef.current.dispersion = getPanelDispersion(panelY);
+      panelContainerRef.current.ior = getPanelIor(panelY)
+      panelContainerRef.current.dispersion = getPanelDispersion(panelY)
     }
 
-    invalidateFrame();
+    invalidateFrame()
   }
 
   function cancelPanelAnimation() {
-    panelAnimationRef.current?.stop();
-    controlsAnimationRef.current?.stop();
-    panelAnimationRef.current = null;
-    controlsAnimationRef.current = null;
+    panelAnimationRef.current?.stop()
+    controlsAnimationRef.current?.stop()
+    panelAnimationRef.current = null
+    controlsAnimationRef.current = null
 
     if (panelTransformRef.current) {
-      yRef.current = panelTransformRef.current.y;
+      yRef.current = panelTransformRef.current.y
     }
   }
 
   function animatePanelY(targetY: number) {
-    cancelPanelAnimation();
+    cancelPanelAnimation()
 
-    const panelTransform = panelTransformRef.current;
-    const controlsTransform = controlsTransformRef.current;
+    const panelTransform = panelTransformRef.current
+    const controlsTransform = controlsTransformRef.current
 
     if (!panelTransform || !controlsTransform) {
-      setPanelY(targetY);
-      return;
+      setPanelY(targetY)
+      return
     }
 
-    const panelControls = animate(
-      panelTransform,
-      { y: targetY },
-      PANEL_TRANSITION,
-    );
-    const buttonControls = animate(
-      controlsTransform,
-      { y: targetY },
-      PANEL_TRANSITION,
-    );
-    panelAnimationRef.current = panelControls;
-    controlsAnimationRef.current = buttonControls;
+    const panelControls = animate(panelTransform, { y: targetY }, PANEL_TRANSITION)
+    const buttonControls = animate(controlsTransform, { y: targetY }, PANEL_TRANSITION)
+    panelAnimationRef.current = panelControls
+    controlsAnimationRef.current = buttonControls
 
     void panelControls.finished.then(() => {
       if (panelAnimationRef.current !== panelControls) {
-        return;
+        return
       }
 
-      panelAnimationRef.current = null;
-      controlsAnimationRef.current = null;
-      setPanelY(panelTransform.y);
-    });
+      panelAnimationRef.current = null
+      controlsAnimationRef.current = null
+      setPanelY(panelTransform.y)
+    })
   }
 
   useEffect(() => {
-    setPanelY(yRef.current);
-    return cancelPanelAnimation;
-  }, []);
+    setPanelY(yRef.current)
+    return cancelPanelAnimation
+  }, [])
 
   useFrame(() => {
-    if (
-      !panelAnimationRef.current ||
-      !panelTransformRef.current ||
-      !panelContainerRef.current
-    ) {
-      return;
+    if (!panelAnimationRef.current || !panelTransformRef.current || !panelContainerRef.current) {
+      return
     }
 
-    panelContainerRef.current.ior = getPanelIor(panelTransformRef.current.y);
-    panelContainerRef.current.dispersion = getPanelDispersion(
-      panelTransformRef.current.y,
-    );
-  });
+    panelContainerRef.current.ior = getPanelIor(panelTransformRef.current.y)
+    panelContainerRef.current.dispersion = getPanelDispersion(panelTransformRef.current.y)
+  })
 
   const bind = useDrag<GlassPointerEvent | PointerEvent>(
     ({ active, first, last, offset: [, panelY] }) => {
       if (first) {
-        setDragging(true);
-        cancelPanelAnimation();
+        setDragging(true)
+        cancelPanelAnimation()
       }
 
       if (last || !active) {
-        const boundedY = clamp(panelY, PANEL_CLOSED_Y, PANEL_OPEN_Y);
-        const openProgress =
-          (boundedY - PANEL_CLOSED_Y) / (PANEL_OPEN_Y - PANEL_CLOSED_Y);
-        const targetY = openProgress > 0.45 ? PANEL_OPEN_Y : PANEL_CLOSED_Y;
-        setDragging(false);
-        setAppIconsVisible(targetY === PANEL_CLOSED_Y);
-        animatePanelY(targetY);
-        return;
+        const boundedY = clamp(panelY, PANEL_CLOSED_Y, PANEL_OPEN_Y)
+        const openProgress = (boundedY - PANEL_CLOSED_Y) / (PANEL_OPEN_Y - PANEL_CLOSED_Y)
+        const targetY = openProgress > 0.45 ? PANEL_OPEN_Y : PANEL_CLOSED_Y
+        setDragging(false)
+        setAppIconsVisible(targetY === PANEL_CLOSED_Y)
+        animatePanelY(targetY)
+        return
       }
 
-      setPanelY(panelY);
+      setPanelY(panelY)
     },
     {
       bounds: { top: PANEL_CLOSED_Y, bottom: PANEL_OPEN_Y },
@@ -272,22 +246,18 @@ function NotificationCenterScene() {
       rubberband: [0, PANEL_RUBBERBAND],
       pointer: {
         capture: false,
-        keys: false,
-      },
-    },
-  );
+        keys: false
+      }
+    }
+  )
 
-  const glassBind = bind() as GlassDragBind;
+  const glassBind = bind() as GlassDragBind
 
   return (
     <ZStack alignment="center">
       <Html zIndex={-3} sizing="fill">
         <div className={styles.backdrop}>
-          <img
-            alt=""
-            className={styles.backgroundImage}
-            src={abstractShapesUrl}
-          />
+          <img alt="" className={styles.backgroundImage} src={abstractShapesUrl} />
         </div>
       </Html>
 
@@ -303,12 +273,9 @@ function NotificationCenterScene() {
               <div key={app.label} className={styles.appItem}>
                 <div
                   className={styles.appIcon}
-                  style={{ "--app-color": app.color } as CSSProperties}
+                  style={{ '--app-color': app.color } as CSSProperties}
                 >
-                  <app.Icon
-                    className={styles.appIconGlyph}
-                    aria-hidden="true"
-                  />
+                  <app.Icon className={styles.appIconGlyph} aria-hidden="true" />
                 </div>
                 <div className={styles.appLabel}>{app.label}</div>
               </div>
@@ -345,12 +312,9 @@ function NotificationCenterScene() {
                       <div
                         key={app.label}
                         className={styles.appIcon}
-                        style={{ "--app-color": app.color } as CSSProperties}
+                        style={{ '--app-color': app.color } as CSSProperties}
                       >
-                        <app.Icon
-                          className={styles.appIconGlyph}
-                          aria-hidden="true"
-                        />
+                        <app.Icon className={styles.appIconGlyph} aria-hidden="true" />
                       </div>
                     ))}
                   </div>
@@ -378,21 +342,14 @@ function NotificationCenterScene() {
           specularFalloff={2.4}
         >
           <Transform ref={panelTransformRef} y={PANEL_OPEN_Y}>
-            <Glass
-              cornerRadius={PANEL_CORNER_RADIUS}
-              pointerEvents
-              {...glassBind}
-            >
+            <Glass cornerRadius={PANEL_CORNER_RADIUS} pointerEvents {...glassBind}>
               <Html sizing="fill">
                 <div className={styles.panelOverlay} data-dragging={dragging}>
                   <div className={styles.drawerInfo}>
                     <div className={styles.drawerMeta}>
                       <span>Tue 12</span>
                       <span className={styles.weather}>
-                        <MoonStar
-                          className={styles.weatherIcon}
-                          aria-hidden="true"
-                        />
+                        <MoonStar className={styles.weatherIcon} aria-hidden="true" />
                         14°
                       </span>
                     </div>
@@ -421,7 +378,7 @@ function NotificationCenterScene() {
             <Padding
               insets={{
                 bottom: 30,
-                horizontal: 30,
+                horizontal: 30
               }}
             >
               <HStack alignment="end">
@@ -440,19 +397,13 @@ function NotificationCenterScene() {
         </GlassContainer>
       </Frame>
     </ZStack>
-  );
+  )
 }
 
-function CenterButton({
-  children,
-  label,
-}: {
-  children: ReactNode;
-  label: string;
-}) {
-  const [hovered, setHovered] = useState(false);
-  const [pressed, setPressed] = useState(false);
-  const scale = pressed ? BUTTON_PRESS_SCALE : hovered ? BUTTON_HOVER_SCALE : 1;
+function CenterButton({ children, label }: { children: ReactNode; label: string }) {
+  const [hovered, setHovered] = useState(false)
+  const [pressed, setPressed] = useState(false)
+  const scale = pressed ? BUTTON_PRESS_SCALE : hovered ? BUTTON_HOVER_SCALE : 1
 
   return (
     <Transform
@@ -461,7 +412,7 @@ function CenterButton({
       origin={{ x: 0.5, y: 0.5 }}
       transition={{
         scaleX: BUTTON_SCALE_TRANSITION,
-        scaleY: BUTTON_SCALE_TRANSITION,
+        scaleY: BUTTON_SCALE_TRANSITION
       }}
     >
       <Frame width={BUTTON_SIZE} height={BUTTON_SIZE}>
@@ -479,5 +430,5 @@ function CenterButton({
         </Glass>
       </Frame>
     </Transform>
-  );
+  )
 }

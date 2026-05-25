@@ -1,12 +1,19 @@
-import { createRouter, RouterProvider } from "@tanstack/react-router";
+import {
+  createRouter,
+  RouterProvider,
+  createHashHistory,
+} from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 
 import { routeTree } from "./routeTree.gen";
+
+const hashHistory = createHashHistory();
 
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   scrollRestoration: true,
+  history: hashHistory,
 });
 
 declare module "@tanstack/react-router" {

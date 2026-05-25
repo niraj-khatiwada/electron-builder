@@ -1,19 +1,27 @@
-# Electron App
+# Liquid Glass Electron
+This app shows the html-in-canvas possibilities to create liquid glass effects.
 
-<img src="./assets/demo.jpg" width="992" />
+![Demo](./assets/demo.mp4)
 
 # Development
-`pnpm@10` is required for this project.
+
 - Install packages
+
 ```
 pnpm install
 ```
-You might need to manually allow `electron-winstaller` to install. pnpm blocks running scripts by default.
+
+You might need to manually allow `electron-winstaller` to install. pnpm blocks running postinstall scripts by default.
+
 ```
 pnpm approve-builds
 ```
 
 - Start dev server
+
 ```
 pnpm run dev
 ```
+
+# Credits
+All credits goes to [Andre Prifer](https://liquid-dom-showcase.vercel.app/) on creating the awesome liquid dom packages.

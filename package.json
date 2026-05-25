@@ -55,7 +55,7 @@
     "@vitejs/plugin-react": "^5.1.1",
     "@webgpu/types": "^0.1.70",
     "electron": "^42.2.0",
-    "electron-builder": "^26.8.1",
+    "electron-builder": "^26.11.1",
     "electron-vite": "^6.0.0-beta.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",

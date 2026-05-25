@@ -1,44 +1,44 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
 type WindowSize = {
-  width: number;
-  height: number;
-};
+  width: number
+  height: number
+}
 
 function getWindowSize(): WindowSize {
   return {
     width: window.innerWidth,
-    height: window.innerHeight,
-  };
+    height: window.innerHeight
+  }
 }
 
 export function useWindowSize(): WindowSize {
-  const [size, setSize] = useState<WindowSize>(() => getWindowSize());
+  const [size, setSize] = useState<WindowSize>(() => getWindowSize())
 
   useEffect(() => {
-    const root = document.documentElement;
+    const root = document.documentElement
 
-    if (!root) return;
+    if (!root) return
 
     const update = () => {
       setSize({
         width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
+        height: window.innerHeight
+      })
+    }
 
-    update();
+    update()
 
     const observer = new ResizeObserver(() => {
-      update();
-    });
+      update()
+    })
 
-    observer.observe(root);
+    observer.observe(root)
 
     return () => {
-      observer.disconnect();
-    };
-  }, []);
+      observer.disconnect()
+    }
+  }, [])
 
-  return size;
+  return size
 }

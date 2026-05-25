@@ -175,7 +175,7 @@
   transition: opacity 180ms ease;
 }
 
-.panelOverlay[data-dragging="true"] .homeIndicator {
+.panelOverlay[data-dragging='true'] .homeIndicator {
   opacity: 0;
 }
 

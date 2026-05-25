@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { type LucideIcon } from "lucide-react";
+import { Frame as FrameT } from '@liquid-dom/core/layout'
 import {
   Frame,
   Glass,
@@ -12,187 +11,186 @@ import {
   Transform,
   ZStack,
   Padding,
-  AnimationConfigProvider,
-} from "@liquid-dom/react";
-import styles from "./index.module.css";
-import { Frame as FrameT } from "@liquid-dom/core/layout";
+  AnimationConfigProvider
+} from '@liquid-dom/react'
+import { type LucideIcon } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 
-const BUTTON_SIZE = 40;
-const CLOSED_MENU_SIZE = 40;
-const CLOSED_MENU_RADIUS = 130;
-const CLOSED_MENU_CONTENT_BLUR = 8;
-const CLOSED_MENU_CONTENT_SCALE = 2;
-const MENU_WIDTH = 320;
-const MENU_HEIGHT = 360;
-const OPEN_MENU_RADIUS = 70;
-const OPEN_MENU_CONTENT_BLUR = 0;
-const MENU_ORIGIN = BUTTON_SIZE / 2;
-const STAGE_WIDTH = MENU_WIDTH + MENU_ORIGIN;
-const STAGE_HEIGHT = MENU_HEIGHT + MENU_ORIGIN;
-const STAGE_PADDING = 20;
-const BUTTON_HOVER_SCALE = 1.08;
-const BUTTON_PRESS_SCALE = 0.94;
-const BUTTON_OPEN_SCALE = 0.5;
-const MENU_OPEN_X = 100;
-const MENU_OPEN_Y = 0;
-const BUTTON_OPEN_X = MENU_OPEN_X + MENU_WIDTH / 2 - BUTTON_SIZE / 2;
-const BUTTON_OPEN_Y = MENU_OPEN_Y + MENU_HEIGHT / 2 - BUTTON_SIZE / 2;
+import styles from './index.module.css'
+
+const BUTTON_SIZE = 40
+const CLOSED_MENU_SIZE = 40
+const CLOSED_MENU_RADIUS = 130
+const CLOSED_MENU_CONTENT_BLUR = 8
+const CLOSED_MENU_CONTENT_SCALE = 2
+const MENU_WIDTH = 320
+const MENU_HEIGHT = 360
+const OPEN_MENU_RADIUS = 70
+const OPEN_MENU_CONTENT_BLUR = 0
+const MENU_ORIGIN = BUTTON_SIZE / 2
+const STAGE_WIDTH = MENU_WIDTH + MENU_ORIGIN
+const STAGE_HEIGHT = MENU_HEIGHT + MENU_ORIGIN
+const STAGE_PADDING = 20
+const BUTTON_HOVER_SCALE = 1.08
+const BUTTON_PRESS_SCALE = 0.94
+const BUTTON_OPEN_SCALE = 0.5
+const MENU_OPEN_X = 100
+const MENU_OPEN_Y = 0
+const BUTTON_OPEN_X = MENU_OPEN_X + MENU_WIDTH / 2 - BUTTON_SIZE / 2
+const BUTTON_OPEN_Y = MENU_OPEN_Y + MENU_HEIGHT / 2 - BUTTON_SIZE / 2
 
 const BUTTON_OPEN_POSITION_TRANSITION = spring({
   stiffness: 499,
-  damping: 22,
-});
+  damping: 22
+})
 const BUTTON_CLOSE_POSITION_TRANSITION = spring({
   stiffness: 90,
   damping: 20,
-  velocity: 2400,
-});
+  velocity: 2400
+})
 const BUTTON_SCALE_TRANSITION = spring({
   stiffness: 155,
-  damping: 24,
-});
+  damping: 24
+})
 const BUTTON_CONTENT_OPEN_TRANSITION = easing({
   duration: 0.01,
-  ease: Easing.easeOut,
-});
+  ease: Easing.easeOut
+})
 const BUTTON_CONTENT_CLOSE_TRANSITION = easing({
   duration: 0.15,
-  ease: Easing.easeIn,
-});
+  ease: Easing.easeIn
+})
 const MENU_OPEN_POSITION_TRANSITION = spring({
   stiffness: 144,
   damping: 14,
-  velocity: 2400,
-});
+  velocity: 2400
+})
 const MENU_OPEN_SIZE_TRANSITION = easing({
   duration: 0.3,
-  ease: Easing.bezier(0.8, 0.3, 0.5, 0.8),
-});
+  ease: Easing.bezier(0.8, 0.3, 0.5, 0.8)
+})
 const MENU_CLOSE_POSITION_TRANSITION = spring({
   stiffness: 130,
-  damping: 18,
-});
+  damping: 18
+})
 const MENU_CLOSE_SIZE_TRANSITION = easing({
   duration: 0.25,
-  ease: Easing.easeOut,
-});
+  ease: Easing.easeOut
+})
 const MENU_OPEN_RADIUS_TRANSITION = easing({
   duration: 0.7,
-  ease: Easing.easeOut,
-});
+  ease: Easing.easeOut
+})
 const MENU_CLOSE_RADIUS_TRANSITION = easing({
   duration: 0.7,
-  ease: Easing.easeOut,
-});
+  ease: Easing.easeOut
+})
 const CONTENT_TRANSITION = spring({
   stiffness: 137,
-  damping: 20,
-});
+  damping: 20
+})
 const CONTENT_BLUR_TRANSITION = easing({
   duration: 0.3,
-  ease: Easing.easeOut,
-});
+  ease: Easing.easeOut
+})
 const CONTENT_OPTICS_TRANSITION = easing({
   duration: 0.3,
-  ease: Easing.easeIn,
-});
-const CONTENT_IOR = 1;
-const CONTENT_DEPTH = 0;
-const CONTENT_ACTIVE_IOR = 1.5;
-const CONTENT_ACTIVE_DEPTH = 80;
-const SLOW_MO_TIME_SCALE = 0.15;
+  ease: Easing.easeIn
+})
+const CONTENT_IOR = 1
+const CONTENT_DEPTH = 0
+const CONTENT_ACTIVE_IOR = 1.5
+const CONTENT_ACTIVE_DEPTH = 80
+const SLOW_MO_TIME_SCALE = 0.15
 
 type MenuItem = {
-  id: string;
-  Icon: LucideIcon;
-  label: string;
-};
+  id: string
+  Icon: LucideIcon
+  label: string
+}
 
 type MenuProps = {
   items: {
-    id: string;
-    type: "hstack" | "vstack" | "divider";
-    items: MenuItem[];
-  }[];
-};
+    id: string
+    type: 'hstack' | 'vstack' | 'divider'
+    items: MenuItem[]
+  }[]
+}
 
 export default function LiquidMenu({ items = [] }: MenuProps) {
-  const [open, setOpen] = useState(false);
-  const [contentOpticsActive, setContentOpticsActive] = useState(false);
-  const [buttonHovered, setButtonHovered] = useState(false);
-  const [buttonPressed, setButtonPressed] = useState(false);
-  const [slowMo, setSlowMo] = useState(false);
-  const ignoreOutsidePressRef = useRef(false);
-  const contentOpticsResetRef = useRef<number | null>(null);
+  const [open, setOpen] = useState(false)
+  const [contentOpticsActive, setContentOpticsActive] = useState(false)
+  const [buttonHovered, setButtonHovered] = useState(false)
+  const [buttonPressed, setButtonPressed] = useState(false)
+  const [slowMo, setSlowMo] = useState(false)
+  const ignoreOutsidePressRef = useRef(false)
+  const contentOpticsResetRef = useRef<number | null>(null)
   const buttonScale = open
     ? BUTTON_OPEN_SCALE
     : buttonPressed
       ? BUTTON_PRESS_SCALE
       : buttonHovered
         ? BUTTON_HOVER_SCALE
-        : 1;
+        : 1
 
-  const menuContainerRef = useRef<FrameT | null>(null);
-  const openRef = useRef<boolean>(open);
+  const menuContainerRef = useRef<FrameT | null>(null)
+  const openRef = useRef<boolean>(open)
 
   useEffect(() => {
-    openRef.current = open;
-  }, [open]);
+    openRef.current = open
+  }, [open])
 
   useEffect(() => {
     if (!open) {
-      return;
+      return
     }
 
-    setButtonHovered(false);
-    setButtonPressed(false);
-  }, [open]);
+    setButtonHovered(false)
+    setButtonPressed(false)
+  }, [open])
 
   useEffect(
     () => () => {
       if (contentOpticsResetRef.current !== null) {
-        window.cancelAnimationFrame(contentOpticsResetRef.current);
+        window.cancelAnimationFrame(contentOpticsResetRef.current)
       }
     },
-    [],
-  );
+    []
+  )
 
   function startContentOpticsTransition() {
     if (contentOpticsResetRef.current !== null) {
-      window.cancelAnimationFrame(contentOpticsResetRef.current);
+      window.cancelAnimationFrame(contentOpticsResetRef.current)
     }
 
-    setContentOpticsActive(true);
+    setContentOpticsActive(true)
     contentOpticsResetRef.current = window.requestAnimationFrame(() => {
-      contentOpticsResetRef.current = null;
-      setContentOpticsActive(false);
-    });
+      contentOpticsResetRef.current = null
+      setContentOpticsActive(false)
+    })
   }
 
   function setMenuOpen(nextOpen: boolean) {
     if (nextOpen === open) {
-      return;
+      return
     }
 
     if (nextOpen) {
-      startContentOpticsTransition();
+      startContentOpticsTransition()
     }
-    setOpen(nextOpen);
+    setOpen(nextOpen)
   }
 
   return (
     <>
-      <LiquidCanvas
-        className={styles.canvasShell}
-        canvasClassName={styles.canvas}
-      >
+      <LiquidCanvas className={styles.canvasShell} canvasClassName={styles.canvas}>
         <AnimationConfigProvider timeScale={slowMo ? SLOW_MO_TIME_SCALE : 1.5}>
           <ZStack alignment="center">
             <Html zIndex={-1} sizing="fill">
               <div className={styles.backgroundImage} />
               <button
                 aria-pressed={slowMo}
-                className={`${styles.slowMoToggle} ${slowMo ? styles.slowMoToggleActive : ""}`}
+                className={`${styles.slowMoToggle} ${slowMo ? styles.slowMoToggleActive : ''}`}
                 type="button"
                 onClick={() => setSlowMo((enabled) => !enabled)}
                 onPointerDown={(event) => event.stopPropagation()}
@@ -203,11 +201,7 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
             </Html>
             <Frame alignment="center">
               <Padding insets={STAGE_PADDING}>
-                <Frame
-                  width={STAGE_WIDTH}
-                  height={STAGE_HEIGHT}
-                  alignment="topLeading"
-                >
+                <Frame width={STAGE_WIDTH} height={STAGE_HEIGHT} alignment="topLeading">
                   <GlassContainer
                     spacing={37}
                     bezelWidth={70}
@@ -219,19 +213,11 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
                     shadowBlur={46}
                     specularOpacity={0.7}
                     displacementBlur={20}
-                    contentIor={
-                      contentOpticsActive ? CONTENT_ACTIVE_IOR : CONTENT_IOR
-                    }
-                    contentDepth={
-                      contentOpticsActive ? CONTENT_ACTIVE_DEPTH : CONTENT_DEPTH
-                    }
+                    contentIor={contentOpticsActive ? CONTENT_ACTIVE_IOR : CONTENT_IOR}
+                    contentDepth={contentOpticsActive ? CONTENT_ACTIVE_DEPTH : CONTENT_DEPTH}
                     transition={{
-                      contentIor: contentOpticsActive
-                        ? false
-                        : CONTENT_OPTICS_TRANSITION,
-                      contentDepth: contentOpticsActive
-                        ? false
-                        : CONTENT_OPTICS_TRANSITION,
+                      contentIor: contentOpticsActive ? false : CONTENT_OPTICS_TRANSITION,
+                      contentDepth: contentOpticsActive ? false : CONTENT_OPTICS_TRANSITION
                     }}
                   >
                     <ZStack alignment="topLeading">
@@ -239,28 +225,18 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
                         x={open ? MENU_OPEN_X : MENU_ORIGIN - MENU_WIDTH / 2}
                         y={open ? MENU_OPEN_Y : MENU_ORIGIN - MENU_HEIGHT / 2}
                         transition={{
-                          x: open
-                            ? MENU_OPEN_POSITION_TRANSITION
-                            : MENU_CLOSE_POSITION_TRANSITION,
-                          y: open
-                            ? MENU_OPEN_POSITION_TRANSITION
-                            : MENU_CLOSE_POSITION_TRANSITION,
+                          x: open ? MENU_OPEN_POSITION_TRANSITION : MENU_CLOSE_POSITION_TRANSITION,
+                          y: open ? MENU_OPEN_POSITION_TRANSITION : MENU_CLOSE_POSITION_TRANSITION
                         }}
                       >
-                        <Frame
-                          width={MENU_WIDTH}
-                          height={MENU_HEIGHT}
-                          ref={menuContainerRef}
-                        >
+                        <Frame width={MENU_WIDTH} height={MENU_HEIGHT} ref={menuContainerRef}>
                           <Glass
-                            cornerRadius={
-                              open ? OPEN_MENU_RADIUS : CLOSED_MENU_RADIUS
-                            }
+                            cornerRadius={open ? OPEN_MENU_RADIUS : CLOSED_MENU_RADIUS}
                             pointerEvents={false}
                             transition={{
                               cornerRadius: open
                                 ? MENU_OPEN_RADIUS_TRANSITION
-                                : MENU_CLOSE_RADIUS_TRANSITION,
+                                : MENU_CLOSE_RADIUS_TRANSITION
                             }}
                             cornerSmoothing={0.6}
                           >
@@ -273,7 +249,7 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
                                   : MENU_CLOSE_SIZE_TRANSITION,
                                 height: open
                                   ? MENU_OPEN_SIZE_TRANSITION
-                                  : MENU_CLOSE_SIZE_TRANSITION,
+                                  : MENU_CLOSE_SIZE_TRANSITION
                               }}
                             >
                               <Transform
@@ -282,28 +258,24 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
                                 origin={{ x: 0.5, y: 0.5 }}
                                 transition={{
                                   scaleX: CONTENT_BLUR_TRANSITION,
-                                  scaleY: CONTENT_BLUR_TRANSITION,
+                                  scaleY: CONTENT_BLUR_TRANSITION
                                 }}
                               >
                                 <Frame width={MENU_WIDTH} height={MENU_HEIGHT}>
                                   <Html
-                                    blur={
-                                      open
-                                        ? OPEN_MENU_CONTENT_BLUR
-                                        : CLOSED_MENU_CONTENT_BLUR
-                                    }
+                                    blur={open ? OPEN_MENU_CONTENT_BLUR : CLOSED_MENU_CONTENT_BLUR}
                                     opacity={open ? 1 : 0}
                                     sizing="fill"
                                     transition={{
                                       blur: CONTENT_BLUR_TRANSITION,
-                                      opacity: CONTENT_TRANSITION,
+                                      opacity: CONTENT_TRANSITION
                                     }}
                                   >
                                     <MenuContent
                                       items={items}
                                       open={open}
                                       onClose={() => {
-                                        setMenuOpen(false);
+                                        setMenuOpen(false)
                                       }}
                                     />
                                   </Html>
@@ -311,7 +283,7 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
                               </Transform>
                             </Frame>
                           </Glass>
-                          ={" "}
+                          ={' '}
                         </Frame>
                       </Transform>
                       <Transform
@@ -328,7 +300,7 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
                             ? BUTTON_OPEN_POSITION_TRANSITION
                             : BUTTON_CLOSE_POSITION_TRANSITION,
                           scaleX: BUTTON_SCALE_TRANSITION,
-                          scaleY: BUTTON_SCALE_TRANSITION,
+                          scaleY: BUTTON_SCALE_TRANSITION
                         }}
                       >
                         <Frame width={BUTTON_SIZE} height={BUTTON_SIZE}>
@@ -338,8 +310,8 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
                             onHover={setButtonHovered}
                             onPress={setButtonPressed}
                             onPointerDown={() => {
-                              ignoreOutsidePressRef.current = true;
-                              setMenuOpen(true);
+                              ignoreOutsidePressRef.current = true
+                              setMenuOpen(true)
                             }}
                           >
                             <Html
@@ -348,7 +320,7 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
                               transition={{
                                 opacity: open
                                   ? BUTTON_CONTENT_OPEN_TRANSITION
-                                  : BUTTON_CONTENT_CLOSE_TRANSITION,
+                                  : BUTTON_CONTENT_CLOSE_TRANSITION
                               }}
                             >
                               <ButtonDots />
@@ -365,7 +337,7 @@ export default function LiquidMenu({ items = [] }: MenuProps) {
         </AnimationConfigProvider>
       </LiquidCanvas>
     </>
-  );
+  )
 }
 
 function ButtonDots() {
@@ -375,60 +347,56 @@ function ButtonDots() {
       <span />
       <span />
     </div>
-  );
+  )
 }
 
 type MenuContentProps = {
-  items: MenuProps["items"];
-  open: boolean;
-  onClose: () => void;
-};
+  items: MenuProps['items']
+  open: boolean
+  onClose: () => void
+}
 
 function MenuContent({ items = [], open, onClose }: MenuContentProps) {
-  const menuContainerRef = useRef<HTMLDivElement | null>(null);
+  const menuContainerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     function onPointerDown(event: globalThis.PointerEvent) {
-      if (!open) return;
+      if (!open) return
 
-      const el = menuContainerRef.current;
-      if (!el) return;
+      const el = menuContainerRef.current
+      if (!el) return
 
-      if (el.contains(event.target as Node)) return;
+      if (el.contains(event.target as Node)) return
 
-      onClose?.();
+      onClose?.()
     }
-    window.addEventListener("pointerdown", onPointerDown, {
-      capture: true,
-    });
+    window.addEventListener('pointerdown', onPointerDown, {
+      capture: true
+    })
 
     return () => {
-      window.removeEventListener("pointerdown", onPointerDown);
-    };
-  }, [open, onClose]);
+      window.removeEventListener('pointerdown', onPointerDown)
+    }
+  }, [open, onClose])
 
   return (
     <div className={styles.menuClip} ref={menuContainerRef}>
       <nav className={styles.menuContent} aria-label="Browser menu">
         {items.map((section) => {
-          const type = section.type;
-          if (type === "divider") {
-            return <div className={styles.divider} key={section.id} />;
-          } else if (type === "hstack") {
+          const type = section.type
+          if (type === 'divider') {
+            return <div className={styles.divider} key={section.id} />
+          } else if (type === 'hstack') {
             return (
               <div className={styles.footerGrid} key={section.id}>
                 {section.items.map((item) => (
                   <div key={item.label} className={styles.footerItem}>
-                    <item.Icon
-                      className={styles.footerIcon}
-                      strokeWidth={1.8}
-                      aria-hidden="true"
-                    />
+                    <item.Icon className={styles.footerIcon} strokeWidth={1.8} aria-hidden="true" />
                     <span>{item.label}</span>
                   </div>
                 ))}
               </div>
-            );
+            )
           }
           return (
             <>
@@ -436,22 +404,18 @@ function MenuContent({ items = [], open, onClose }: MenuContentProps) {
                 <MenuRow key={item.label} item={item} />
               ))}
             </>
-          );
+          )
         })}
       </nav>
     </div>
-  );
+  )
 }
 
 function MenuRow({ item }: { item: MenuItem }) {
   return (
     <div className={styles.menuRow}>
-      <item.Icon
-        className={styles.menuIcon}
-        strokeWidth={1.8}
-        aria-hidden="true"
-      />
+      <item.Icon className={styles.menuIcon} strokeWidth={1.8} aria-hidden="true" />
       <span>{item.label}</span>
     </div>
-  );
+  )
 }

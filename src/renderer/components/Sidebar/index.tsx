@@ -1,62 +1,47 @@
-import { ReactNode } from "react";
-import {
-  Frame,
-  Glass,
-  GlassContainer,
-  Html,
-  LiquidCanvas,
-  ZStack,
-} from "@liquid-dom/react";
-import { type LucideIcon } from "lucide-react";
-import styles from "./index.module.css";
-import { useWindowSize } from "~/hooks/useWindowResize";
+import { Frame, Glass, GlassContainer, Html, LiquidCanvas, ZStack } from '@liquid-dom/react'
+import { type LucideIcon } from 'lucide-react'
+import { ReactNode } from 'react'
+
+import { useWindowSize } from '~/hooks/useWindowResize'
+
+import styles from './index.module.css'
 
 type SidebarItem = {
-  id: string;
-  Icon: LucideIcon;
-  label: string;
-};
+  id: string
+  Icon: LucideIcon
+  label: string
+}
 
 type SidebarProps = {
-  renderMainContent?: () => ReactNode;
+  renderMainContent?: () => ReactNode
   items: {
-    id: string;
-    type: "sidebarItem" | "divider";
-    items: SidebarItem[];
-    sectionTitle?: string | null;
-  }[];
-  activeItemId?: string;
-  onItemSelect?: (id: string) => void;
+    id: string
+    type: 'sidebarItem' | 'divider'
+    items: SidebarItem[]
+    sectionTitle?: string | null
+  }[]
+  activeItemId?: string
+  onItemSelect?: (id: string) => void
   /**
    * Nested canvas element only works in column mode
    */
-  layoutMode?: "overlay" | "column";
-};
+  layoutMode?: 'overlay' | 'column'
+}
 
 export default function Sidebar({
   items,
   renderMainContent,
   activeItemId,
   onItemSelect,
-  layoutMode = "column",
+  layoutMode = 'column'
 }: SidebarProps) {
-  const { height } = useWindowSize();
+  const { height } = useWindowSize()
   return (
-    <section
-      className={`${styles.root} ${layoutMode === "overlay" ? styles.overlay : ""}`}
-    >
-      <LiquidCanvas
-        className={styles.canvasShell}
-        canvasClassName={styles.canvas}
-      >
-        <ZStack alignment={"trailing"}>
-          {layoutMode === "overlay" ? renderMainContent?.() : null}
-          <Frame
-            maxWidth={Infinity}
-            maxHeight={Infinity}
-            height={height}
-            alignment={"leading"}
-          >
+    <section className={`${styles.root} ${layoutMode === 'overlay' ? styles.overlay : ''}`}>
+      <LiquidCanvas className={styles.canvasShell} canvasClassName={styles.canvas}>
+        <ZStack alignment={'trailing'}>
+          {layoutMode === 'overlay' ? renderMainContent?.() : null}
+          <Frame maxWidth={Infinity} maxHeight={Infinity} height={height} alignment={'leading'}>
             <GlassContainer
               blur={200}
               bezelWidth={170}
@@ -86,22 +71,22 @@ export default function Sidebar({
           </Frame>
         </ZStack>
       </LiquidCanvas>
-      {layoutMode === "column" ? renderMainContent?.() : null}
+      {layoutMode === 'column' ? renderMainContent?.() : null}
     </section>
-  );
+  )
 }
 
 type SidebarLeftProps = {
-  items: SidebarProps["items"];
-  activeItemId?: string;
-  onItemSelect?: (id: string) => void;
-};
+  items: SidebarProps['items']
+  activeItemId?: string
+  onItemSelect?: (id: string) => void
+}
 function SidebarLeft({ items, activeItemId, onItemSelect }: SidebarLeftProps) {
   return (
     <nav className={styles.sidebarContent} aria-label="Sidebar navigation">
       {items.map((li) => {
-        if (li.type === "divider") {
-          return <div className={styles.divider} key={li.id} />;
+        if (li.type === 'divider') {
+          return <div className={styles.divider} key={li.id} />
         }
         return (
           <SidebarGroup
@@ -111,22 +96,22 @@ function SidebarLeft({ items, activeItemId, onItemSelect }: SidebarLeftProps) {
             activeItemId={activeItemId}
             onItemSelect={onItemSelect}
           />
-        );
+        )
       })}
     </nav>
-  );
+  )
 }
 
 function SidebarGroup({
   title,
   items,
   activeItemId,
-  onItemSelect,
+  onItemSelect
 }: {
-  title?: string;
-  items: SidebarItem[];
-  activeItemId?: string;
-  onItemSelect?: (id: string) => void;
+  title?: string
+  items: SidebarItem[]
+  activeItemId?: string
+  onItemSelect?: (id: string) => void
 }) {
   return (
     <div className={styles.sidebarGroup}>
@@ -136,10 +121,10 @@ function SidebarGroup({
           key={item.id}
           className={[
             styles.sidebarItem,
-            item.id === activeItemId ? styles.sidebarItemActive : "",
-          ].join(" ")}
+            item.id === activeItemId ? styles.sidebarItemActive : ''
+          ].join(' ')}
           type="button"
-          aria-current={item.id === activeItemId ? "page" : undefined}
+          aria-current={item.id === activeItemId ? 'page' : undefined}
           onClick={() => onItemSelect?.(item.id)}
         >
           <item.Icon className={styles.icon} aria-hidden="true" />
@@ -147,5 +132,5 @@ function SidebarGroup({
         </button>
       ))}
     </div>
-  );
+  )
 }
