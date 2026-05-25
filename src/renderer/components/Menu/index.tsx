@@ -13,10 +13,7 @@ import {
   ZStack,
   Padding,
   AnimationConfigProvider,
-  HStack,
-  VStack,
 } from "@liquid-dom/react";
-import TahoeImage from "~/assets/images/tahoe.jpg";
 import styles from "./index.module.css";
 import { Frame as FrameT } from "@liquid-dom/core/layout";
 import { useLayoutEffect } from "@tanstack/react-router";
@@ -192,9 +189,9 @@ export default function Menu({ items = [] }: MenuProps) {
       >
         <AnimationConfigProvider timeScale={slowMo ? SLOW_MO_TIME_SCALE : 1.5}>
           <ZStack alignment="center">
-            {/*<Html zIndex={-1} sizing="fill">
-              <img alt="" className={styles.backgroundImage} src={TahoeImage} />
-            </Html>*/}
+            <Html zIndex={-1} sizing="fill">
+              <div className={styles.backgroundImage} />
+            </Html>
             <Frame alignment="center">
               <Padding insets={STAGE_PADDING}>
                 <Frame

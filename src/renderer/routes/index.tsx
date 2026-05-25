@@ -1,6 +1,5 @@
 import { Button } from "@heroui/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, AnimatePresence } from "framer-motion";
 import { useCallback, useState } from "react";
 import {
   Copy,
@@ -9,28 +8,17 @@ import {
   Upload,
   Hand,
   Plus,
-  Album,
-  Clock3,
   Grid2X2,
-  Grid3X3,
   House,
-  MicVocal,
-  Music,
   Radio,
   Search,
-  SquareUserRound,
-  Star,
-  type LucideIcon,
 } from "lucide-react";
 
 import Icon from "~/components/Icon";
-import { ThemeSwitcher } from "~/components/ThemeSwitcher";
 import { SIDENAV_STORAGE_KEY } from "~/constants";
 
-import styles from "./index.module.css";
 import Menu from "~/components/Menu";
 import Sidebar from "~/components/Sidebar";
-import { Html } from "@liquid-dom/react";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -216,33 +204,6 @@ function App() {
             ]}
           />
         )}
-        // renderMainContent={() => (
-        //   <Html sizing="fill" zIndex={-1}>
-        //     <div className="w-full max-h-[80vh] overflow-y-scroll">
-        //       <h1 className="w-full bg-red-200 text-[200px]!  text-red-900">
-        //         HELLO WORLD
-        //       </h1>
-        //       <h1 className="w-full bg-red-200 text-[200px]!  text-red-900">
-        //         HELLO WORLD
-        //       </h1>
-        //       <h1 className="w-full bg-red-200 text-[200px]!  text-red-900">
-        //         HELLO WORLD
-        //       </h1>
-        //       <h1 className="w-full bg-red-200 text-[200px]!  text-red-900">
-        //         HELLO WORLD
-        //       </h1>
-        //       <h1 className="w-full bg-red-200 text-[200px]!  text-red-900">
-        //         HELLO WORLD
-        //       </h1>
-        //       <h1 className="w-full bg-red-200 text-[200px]!  text-red-900">
-        //         HELLO WORLD
-        //       </h1>
-        //       <h1 className="w-full bg-red-200 text-[200px]!  text-red-900">
-        //         HELLO WORLD
-        //       </h1>
-        //     </div>
-        //   </Html>
-        // )}
       />
     </div>
   );

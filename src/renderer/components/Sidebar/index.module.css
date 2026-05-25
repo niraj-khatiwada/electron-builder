@@ -6,6 +6,7 @@
   position: relative;
   display: grid;
   grid-template-columns: 260px 1fr;
+  gap: 8px;
 }
 
 .canvasShell {
@@ -23,7 +24,6 @@
   width: 100%;
   height: 100%;
   background: transparent;
-  padding: 8px;
 }
 
 .albumGrid {
@@ -77,14 +77,13 @@
   gap: 14px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 16px 11px;
+  padding: 45px 11px 16px 11px;
   color: rgba(255, 255, 255, 0.92);
   font-size: 14px;
   font-weight: 400;
   line-height: 1;
   scrollbar-width: none;
   user-select: none;
-  /*background-color: green;*/
 }
 
 .sidebarContent::-webkit-scrollbar {
@@ -158,14 +157,4 @@
   height: 1px;
   margin: 12px 0;
   background: rgba(9, 9, 11, 0.1);
-}
-
-.backgroundImage {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: absolute;
-  inset: 0;
-  z-index: -1;
 }

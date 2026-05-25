@@ -6,7 +6,6 @@ import { app, shell, BrowserWindow, ipcMain } from "electron";
 import icon from "../../resources/icon.png?asset";
 
 function createWindow(): void {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -14,8 +13,11 @@ function createWindow(): void {
     autoHideMenuBar: true,
     vibrancy: "fullscreen-ui",
     backgroundMaterial: "acrylic",
+    transparent: true,
     backgroundColor: "#00000000",
     titleBarStyle: "hidden",
+    trafficLightPosition: { x: 20, y: 15 },
+    frame: false,
     ...(process.platform !== "darwin" ? { titleBarOverlay: true } : {}),
     ...(process.platform === "linux" ? { icon } : {}),
     webPreferences: {
@@ -63,6 +65,8 @@ function createWindow(): void {
 
 // Chromoum flags
 app.commandLine.appendSwitch("enable-blink-features", "CanvasDrawElement");
+app.commandLine.appendSwitch("enable-blink-features", "HTMLCanvasElement");
+app.commandLine.appendSwitch("enable-experimental-web-platform-features");
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

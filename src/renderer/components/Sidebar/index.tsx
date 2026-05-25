@@ -6,13 +6,10 @@ import {
   Html,
   LiquidCanvas,
   Transform,
-  ZStack,
 } from "@liquid-dom/react";
 import { type LucideIcon } from "lucide-react";
 import styles from "./index.module.css";
 import { useWindowSize } from "~/hooks/useWindowResize";
-
-const SIDEBAR_WIDTH = 260;
 
 type SidebarItem = {
   id: string;
@@ -38,7 +35,7 @@ export default function Sidebar({ items, renderMainContent }: SidebarProps) {
         className={styles.canvasShell}
         canvasClassName={styles.canvas}
       >
-        <Frame maxWidth={Infinity} maxHeight={Infinity} alignment={"leading"}>
+        <Frame maxWidth={Infinity} maxHeight={Infinity} height={height}>
           <GlassContainer
             blur={200}
             bezelWidth={170}
@@ -53,7 +50,7 @@ export default function Sidebar({ items, renderMainContent }: SidebarProps) {
           >
             <Transform>
               <Glass cornerRadius={40}>
-                <Frame width={SIDEBAR_WIDTH} height={height}>
+                <Frame>
                   <Html sizing="fill">
                     <SidebarLeft items={items} />
                   </Html>
