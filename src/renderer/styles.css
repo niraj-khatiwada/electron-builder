@@ -81,7 +81,12 @@ button {
 
 #titlebar {
   position: fixed;
-  height: 30px;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
   app-region: drag;
   -webkit-app-region: drag;
+  z-index: 100000;
+  pointer-events: auto;
 }

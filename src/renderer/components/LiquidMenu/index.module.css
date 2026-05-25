@@ -20,7 +20,6 @@
   object-fit: cover;
   padding: 0 10px;
   background: url("../../assets/images/tahoe.jpg") center/cover;
-  border-radius: 30px;
 }
 
 .buttonContent {
@@ -132,7 +131,8 @@
 
 .slowMoToggle {
   position: absolute;
-  right: 16px;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 16px;
   z-index: 2;
   display: flex;

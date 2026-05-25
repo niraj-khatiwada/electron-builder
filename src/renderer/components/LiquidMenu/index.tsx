@@ -116,7 +116,7 @@ type MenuProps = {
   }[];
 };
 
-export default function Menu({ items = [] }: MenuProps) {
+export default function LiquidMenu({ items = [] }: MenuProps) {
   const [open, setOpen] = useState(false);
   const [contentOpticsActive, setContentOpticsActive] = useState(false);
   const [buttonHovered, setButtonHovered] = useState(false);
@@ -190,6 +190,16 @@ export default function Menu({ items = [] }: MenuProps) {
           <ZStack alignment="center">
             <Html zIndex={-1} sizing="fill">
               <div className={styles.backgroundImage} />
+              <button
+                aria-pressed={slowMo}
+                className={`${styles.slowMoToggle} ${slowMo ? styles.slowMoToggleActive : ""}`}
+                type="button"
+                onClick={() => setSlowMo((enabled) => !enabled)}
+                onPointerDown={(event) => event.stopPropagation()}
+              >
+                <span className={styles.slowMoCheckbox} aria-hidden="true" />
+                Slow mo
+              </button>
             </Html>
             <Frame alignment="center">
               <Padding insets={STAGE_PADDING}>
@@ -354,16 +364,6 @@ export default function Menu({ items = [] }: MenuProps) {
           </ZStack>
         </AnimationConfigProvider>
       </LiquidCanvas>
-      <button
-        aria-pressed={slowMo}
-        className={`${styles.slowMoToggle} ${slowMo ? styles.slowMoToggleActive : ""}`}
-        type="button"
-        onClick={() => setSlowMo((enabled) => !enabled)}
-        onPointerDown={(event) => event.stopPropagation()}
-      >
-        <span className={styles.slowMoCheckbox} aria-hidden="true" />
-        Slow mo
-      </button>
     </>
   );
 }

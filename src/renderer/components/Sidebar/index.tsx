@@ -1,11 +1,11 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import {
   Frame,
   Glass,
   GlassContainer,
   Html,
   LiquidCanvas,
-  Transform,
+  ZStack,
 } from "@liquid-dom/react";
 import { type LucideIcon } from "lucide-react";
 import styles from "./index.module.css";
@@ -25,52 +25,78 @@ type SidebarProps = {
     items: SidebarItem[];
     sectionTitle?: string | null;
   }[];
+  activeItemId?: string;
+  onItemSelect?: (id: string) => void;
+  /**
+   * Nested canvas element only works in column mode
+   */
+  layoutMode?: "overlay" | "column";
 };
 
-export default function Sidebar({ items, renderMainContent }: SidebarProps) {
+export default function Sidebar({
+  items,
+  renderMainContent,
+  activeItemId,
+  onItemSelect,
+  layoutMode = "column",
+}: SidebarProps) {
   const { height } = useWindowSize();
   return (
-    <section className={styles.root}>
+    <section
+      className={`${styles.root} ${layoutMode === "overlay" ? styles.overlay : ""}`}
+    >
       <LiquidCanvas
         className={styles.canvasShell}
         canvasClassName={styles.canvas}
       >
-        <Frame maxWidth={Infinity} maxHeight={Infinity} height={height}>
-          <GlassContainer
-            blur={200}
-            bezelWidth={170}
-            displacementBlur={25}
-            thickness={0}
-            shadowColor={{ r: 0, g: 0, b: 0, a: 0.28 }}
-            shadowBlur={30}
-            specularOpacity={0.9}
-            surfaceProfile="concave"
-            specularFalloff={2}
-            tint={{ r: 0.15, g: 0.15, b: 0.15, a: 0.8 }}
+        <ZStack alignment={"trailing"}>
+          {layoutMode === "overlay" ? renderMainContent?.() : null}
+          <Frame
+            maxWidth={Infinity}
+            maxHeight={Infinity}
+            height={height}
+            alignment={"leading"}
           >
-            <Transform>
+            <GlassContainer
+              blur={200}
+              bezelWidth={170}
+              displacementBlur={25}
+              thickness={0}
+              dispersion={10}
+              shadowColor={{ r: 0, g: 0, b: 0, a: 0.28 }}
+              shadowBlur={30}
+              specularOpacity={1}
+              surfaceProfile="concave"
+              specularFalloff={2}
+              specularWidth={1}
+              tint={{ r: 0.15, g: 0.15, b: 0.15, a: 0.9 }}
+            >
               <Glass cornerRadius={40}>
-                <Frame>
+                <Frame width={260}>
                   <Html sizing="fill">
-                    <SidebarLeft items={items} />
+                    <SidebarLeft
+                      items={items}
+                      activeItemId={activeItemId}
+                      onItemSelect={onItemSelect}
+                    />
                   </Html>
                 </Frame>
               </Glass>
-            </Transform>
-          </GlassContainer>
-        </Frame>
+            </GlassContainer>
+          </Frame>
+        </ZStack>
       </LiquidCanvas>
-      {renderMainContent?.()}
+      {layoutMode === "column" ? renderMainContent?.() : null}
     </section>
   );
 }
 
 type SidebarLeftProps = {
   items: SidebarProps["items"];
+  activeItemId?: string;
+  onItemSelect?: (id: string) => void;
 };
-function SidebarLeft({ items }: SidebarLeftProps) {
-  const [selectedItem, setSelectedItem] = useState("Home");
-
+function SidebarLeft({ items, activeItemId, onItemSelect }: SidebarLeftProps) {
   return (
     <nav className={styles.sidebarContent} aria-label="Sidebar navigation">
       {items.map((li) => {
@@ -82,8 +108,8 @@ function SidebarLeft({ items }: SidebarLeftProps) {
             key={li.id}
             title={li.sectionTitle ?? undefined}
             items={li.items}
-            selectedItem={selectedItem}
-            onSelect={setSelectedItem}
+            activeItemId={activeItemId}
+            onItemSelect={onItemSelect}
           />
         );
       })}
@@ -94,27 +120,27 @@ function SidebarLeft({ items }: SidebarLeftProps) {
 function SidebarGroup({
   title,
   items,
-  selectedItem,
-  onSelect,
+  activeItemId,
+  onItemSelect,
 }: {
   title?: string;
   items: SidebarItem[];
-  selectedItem: string;
-  onSelect: (label: string) => void;
+  activeItemId?: string;
+  onItemSelect?: (id: string) => void;
 }) {
   return (
     <div className={styles.sidebarGroup}>
       {title ? <div className={styles.groupTitle}>{title}</div> : null}
       {items.map((item) => (
         <button
-          key={item.label}
+          key={item.id}
           className={[
             styles.sidebarItem,
-            item.label === selectedItem ? styles.sidebarItemActive : "",
+            item.id === activeItemId ? styles.sidebarItemActive : "",
           ].join(" ")}
           type="button"
-          aria-current={item.label === selectedItem ? "page" : undefined}
-          onClick={() => onSelect(item.label)}
+          aria-current={item.id === activeItemId ? "page" : undefined}
+          onClick={() => onItemSelect?.(item.id)}
         >
           <item.Icon className={styles.icon} aria-hidden="true" />
           <span>{item.label}</span>

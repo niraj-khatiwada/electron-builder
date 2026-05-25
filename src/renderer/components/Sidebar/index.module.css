@@ -9,6 +9,11 @@
   gap: 8px;
 }
 
+.overlay {
+  display: block;
+  gap: 0;
+}
+
 .canvasShell {
   position: relative;
   width: 100%;
@@ -107,7 +112,7 @@
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
-  gap: 9px;
+  gap: 2px;
   height: 30px;
   padding: 0 8px;
   border: 0;
@@ -143,8 +148,8 @@
 }
 
 .icon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   overflow: visible;
   fill: none;
   stroke: currentColor;
