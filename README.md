@@ -2,7 +2,7 @@
 
 This app shows the html-in-canvas possibilities to create liquid glass effects.
 
-![Demo](./assets/demo.mp4)
+https://github.com/user-attachments/assets/f3e58e58-ca66-4def-8769-0c0a2a601d1e
 
 # Development
 
