@@ -190,6 +190,7 @@
         "react/only-export-components": [
           "error",
           {
+            "allowExportNames": ["Route"],
             "allowConstantExport": true
           }
         ]

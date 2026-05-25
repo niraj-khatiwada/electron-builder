@@ -16,7 +16,6 @@ import {
 } from "@liquid-dom/react";
 import styles from "./index.module.css";
 import { Frame as FrameT } from "@liquid-dom/core/layout";
-import { useLayoutEffect } from "@tanstack/react-router";
 
 const BUTTON_SIZE = 40;
 const CLOSED_MENU_SIZE = 40;
@@ -385,28 +384,8 @@ type MenuContentProps = {
   onClose: () => void;
 };
 
-function MenuContent({ items, open, onClose }: MenuContentProps) {
+function MenuContent({ items = [], open, onClose }: MenuContentProps) {
   const menuContainerRef = useRef<HTMLDivElement | null>(null);
-
-  useLayoutEffect(() => {
-    const el = menuContainerRef.current;
-    if (!el) return;
-
-    const measure = () => {
-      const rect = el.getBoundingClientRect();
-
-      console.log(rect);
-    };
-
-    // immediate first measure
-    measure();
-
-    // future layout changes
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-
-    return () => ro.disconnect();
-  }, []);
 
   useEffect(() => {
     function onPointerDown(event: globalThis.PointerEvent) {
@@ -426,7 +405,7 @@ function MenuContent({ items, open, onClose }: MenuContentProps) {
     return () => {
       window.removeEventListener("pointerdown", onPointerDown);
     };
-  }, [open]);
+  }, [open, onClose]);
 
   return (
     <div className={styles.menuClip} ref={menuContainerRef}>
@@ -437,7 +416,7 @@ function MenuContent({ items, open, onClose }: MenuContentProps) {
             return <div className={styles.divider} key={section.id} />;
           } else if (type === "hstack") {
             return (
-              <div className={styles.footerGrid}>
+              <div className={styles.footerGrid} key={section.id}>
                 {section.items.map((item) => (
                   <div key={item.label} className={styles.footerItem}>
                     <item.Icon
