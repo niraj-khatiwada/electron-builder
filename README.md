@@ -1,4 +1,5 @@
 # Liquid Glass Electron
+
 This app shows the html-in-canvas possibilities to create liquid glass effects.
 
 ![Demo](./assets/demo.mp4)
@@ -24,4 +25,5 @@ pnpm run dev
 ```
 
 # Credits
+
 All credits goes to [Andre Prifer](https://liquid-dom-showcase.vercel.app/) on creating the awesome liquid dom packages.
